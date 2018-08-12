@@ -25,20 +25,25 @@ if (!isset($_SESSION['user_id'])) {
     <link rel="stylesheet" href="css/styles.css">
 </head>
 <body id="body" class="clearfix" onload="load_data('chat_load=1')">
-	<h3 class="main_header">chatApp php_ajax</h3>
-	<div id="loader">
-		<div></div>
-	</div>
-	<div id="chat_box">
-		
+	<h3 class="main_header"><a href="https://github.com/EzzatRashed/chatApp">chatApp php_ajax</a></h3>
+	<div class="chat_box">
+		<div class="people_list">
+			<div class="loader">
+				<div></div>
+			</div>
+		</div>
+		<div id="chat">
+			<h2 class="default_h2">Welcome Back!</h2>
+			<p class="default_p">You can now chat with anyone you want, Just click on them and start the chat!</p>
+		</div>
 	</div>
 </body>
-<script>
+<!-- <script>
 	function load_data(a) {
 		var xhttp = new XMLHttpRequest();
 		xhttp.onreadystatechange = function() {
 		if (this.readyState == 4 && this.status == 200 && this.responseText != "") {
-				document.getElementById('loader').setAttribute("style","display:none;");
+				document.getElementsByClassName('loader')[0].setAttribute("style","display:none;");
 		 		document.getElementById('chat_box').innerHTML = this.responseText;
 			}
 		};
@@ -46,5 +51,5 @@ if (!isset($_SESSION['user_id'])) {
 		xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
 		xhttp.send(a);
 	}
-</script>
+</script> -->
 </html>

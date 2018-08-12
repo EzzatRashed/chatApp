@@ -126,7 +126,6 @@ button.submit_btn{
     outline: none;
     -webkit-tap-highlight-color: transparent;
     tap-highlight-color: transparent;
-    box-shadow: 0 2px 5px 0 rgba(0,0,0,.08);
     transition: color .15s ease-in-out,background-color .15s ease-in-out,box-shadow .15s ease-in-out;
 }
 
@@ -143,8 +142,8 @@ button.submit_btn:active, button.submit_btn:focus {
 
 /* -- chat page -- */
 
-div#loader div{
-	border: 10px solid #f3f3f3;
+div.loader div{
+	border: 10px solid #fff;
     border-top: 10px solid #43a7ff;
     border-radius: 50%;
     width: 80px;
@@ -153,7 +152,7 @@ div#loader div{
     animation: spin .5s linear infinite;
 }
 
-div#loader {
+div.loader {
     display: table;
     margin: 100px auto;
 }
@@ -169,29 +168,41 @@ div#loader {
 }
 
 div.chat_box{
-    margin: 0 auto;
-	width: 900px;
-    height: 650px;
+    margin: 0 auto 50px auto;
+	width: 1000px;
+    height: 600px;
     display: flex;
     flex-wrap: nowrap;
 }
 
 div.people_list {
-    border-top-right-radius: 5px;
-    border-bottom-right-radius: 5px;
-    background-color: #D8D1F6;
+    border-top-left-radius: 2px;
+    border-bottom-left-radius: 2px;
+    background-color: #43a7ff;
     min-height: 120px;
-    flex: 1;
+    flex: 2;
 }
 
 div#chat {
     display: flex;
     flex-direction: column;
-    border-top-left-radius: 5px;
-    border-bottom-left-radius: 5px;
-    border: 1px solid #d8d1f6;
-    border-right: 0;
-    background-color: #f8f7ff;
+    border-top-right-radius: 2px;
+    border-bottom-right-radius: 2px;
+    border: 1px solid #43a7ff;
+    border-left: 0;
+    background-color: #ffffff;
     min-height: 120px;
-    flex: 2;
+    flex: 5;
+}
+
+p.default_p,
+h2.default_h2{
+	text-align: center;
+	font-weight: 500;
+    color: #6a6a6a;
+    margin: 40px auto;
+}
+
+p.default_p{
+    margin: 0 auto;
 }
