@@ -1,0 +1,197 @@
+/* -- globals -- */
+
+* {
+    box-sizing: border-box;
+}
+
+html{font-size: 14px;}
+
+body{
+	background-color: #f3f9ff;
+	color: #000;
+    font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol";
+	margin: 0;
+	padding: 0;
+	overflow: visible;
+	-webkit-text-size-adjust: 100%;
+	-webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+	-webkit-tap-highlight-color: transparent;
+	tap-highlight-color: transparent;
+}
+
+.clearfix::after{
+    content: "";
+    clear: both;
+    display: table;
+}
+
+a, button, textarea, input {
+    text-decoration: none;
+    color: inherit;
+    outline: 0;
+    -webkit-tap-highlight-color: transparent;
+    tap-highlight-color: transparent;
+}
+
+h3.main_header{
+	text-align: center;
+	width: auto;
+	margin: 15px auto;
+	margin-bottom: 25px;
+	font-weight: 500;
+	font-size: 1.75rem;
+}
+
+/* -- globals end here -- */
+
+/* -- login page -- */
+
+div.login_box{
+	display: block;
+    background-color: white;
+    border: 1px solid #e8e8e8;
+    width: 100%;
+    max-width: 440px;
+    margin: 0 auto;
+    border-radius: 3px;
+}
+
+div.login_header{
+	padding: 1.15rem 2rem;
+	border-bottom: 1px solid #e8e8e8;
+}
+
+div.login_header h2{
+	margin: 0;
+	font-weight: 400;
+}
+
+div.login_body{
+	padding: 1.15rem 2rem;
+}
+
+div.error{
+	padding: 1px;
+	margin-bottom: 15px;
+	margin-top: 5px;
+    background-color: #ffdddd;
+    border-left: 6px solid #f44336;
+    width: 100%;
+}
+
+div.login_container label{
+	display: block;
+    font-size: 15px;
+    font-weight: 500;
+    color: #798196;
+    margin-bottom: 5px;
+}
+
+input.input_box{
+	width: 100%;
+	height: 35px;
+    box-shadow: none;
+    background-color: #fff;
+    border-radius: 0.2rem;
+    border: 1px solid #d0d0d0;
+    margin-bottom: 15px;
+    direction: ltr;
+    font-size: 20px;
+    padding-left: 4px;
+}
+
+div.gender{
+	margin-bottom: 5px;
+}
+
+label.radio, input.radio{
+	display: inline-block !important;
+	padding-right: 10px;
+}
+
+button.submit_btn{
+	cursor: pointer;
+    width: 100%;
+    padding: .8rem 2rem;
+    font-size: 1.25rem;
+    font-weight: 500;
+    margin: 10px 0;
+    user-select: none;
+    color: #43a7ff;
+    border-radius: 3px;
+    background-color: white;
+    border: 1px solid #43a7ff;
+    font-family: inherit;
+    outline: none;
+    -webkit-tap-highlight-color: transparent;
+    tap-highlight-color: transparent;
+    box-shadow: 0 2px 5px 0 rgba(0,0,0,.08);
+    transition: color .15s ease-in-out,background-color .15s ease-in-out,box-shadow .15s ease-in-out;
+}
+
+button.submit_btn:hover {
+    color: #fff;
+    background-color: #43a7ff;
+}
+
+button.submit_btn:active, button.submit_btn:focus {
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, .2);
+}
+
+/* -- login page end here -- */
+
+/* -- chat page -- */
+
+div#loader div{
+	border: 10px solid #f3f3f3;
+    border-top: 10px solid #43a7ff;
+    border-radius: 50%;
+    width: 80px;
+    height: 80px;
+    -webkit-animation: spin .5s linear infinite;
+    animation: spin .5s linear infinite;
+}
+
+div#loader {
+    display: table;
+    margin: 100px auto;
+}
+
+@-webkit-keyframes spin {
+    0% { -webkit-transform: rotate(0deg); transform: rotate(0deg); }
+    100% { -webkit-transform: rotate(360deg); transform: rotate(360deg); }
+}
+
+@keyframes spin {
+    0% { -webkit-transform: rotate(0deg); transform: rotate(0deg); }
+    100% { -webkit-transform: rotate(360deg); transform: rotate(360deg); }
+}
+
+div.chat_box{
+    margin: 0 auto;
+	width: 900px;
+    height: 650px;
+    display: flex;
+    flex-wrap: nowrap;
+}
+
+div.people_list {
+    border-top-right-radius: 5px;
+    border-bottom-right-radius: 5px;
+    background-color: #D8D1F6;
+    min-height: 120px;
+    flex: 1;
+}
+
+div#chat {
+    display: flex;
+    flex-direction: column;
+    border-top-left-radius: 5px;
+    border-bottom-left-radius: 5px;
+    border: 1px solid #d8d1f6;
+    border-right: 0;
+    background-color: #f8f7ff;
+    min-height: 120px;
+    flex: 2;
+}
