@@ -123,7 +123,6 @@ function updateChatbox(){
 	    var xhttp = new XMLHttpRequest();
 	    xhttp.onreadystatechange = function() {
 	    if (this.readyState == 4 && this.status == 200 && this.responseText != "") {
-	    		console.log(this.responseText);
 	            var response = this.responseText;
 	            response = response.split(',');
 	            response.splice(-1,1);

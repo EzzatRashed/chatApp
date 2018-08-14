@@ -255,7 +255,7 @@ if (isset($_SESSION['user_id']) && isset($_POST['msg']) && isset($_POST['to']) &
 	// Check For Exsisting Conversation
 	$conv_query = checkExsistingConv($my_user_name, $other_user_name);
 	if(empty($conv_query)){
-		$conv_token = bin2hex(random_bytes(20));
+		$conv_token = bin2hex(random_bytes(10));
 		$sql = "INSERT INTO conversations (conv_token, conv_username1, conv_username2) VALUES (:conv_token, :conv_username1, :conv_username2)";
 		$insert_query = $conn->prepare($sql);
 		$insert_query->execute(array(
