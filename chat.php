@@ -4,13 +4,29 @@
 session_start();
 require_once 'db.php';
 
+if (isset($_GET['logout']) && $_GET['logout'] == true && isset($_SESSION['user_id'])) {
+	$user_id = $_SESSION['user_id']; 
+	$user_name = $_SESSION['user_name']; 
+
+	$delete_query = $conn->prepare("DELETE FROM users WHERE user_id = :user_id");
+	$delete_query->bindParam(':user_id', $user_id);
+	$delete_query->execute();
+
+	$delete_query = $conn->prepare("DELETE FROM conversations WHERE conv_username1 = :user_name OR conv_username2 = :user_name");
+	$delete_query->bindParam(':user_name', $user_name);
+	$delete_query->execute();
+
+	unset($_COOKIE['MEMBER']);
+	setcookie('MEMBER', '', strtotime('-3 days'), '/chatApp');
+}
+
 if (!isset($_COOKIE['MEMBER'])) {
-	setcookie('MEMBER', '', strtotime('-3 days'));
+	unset($_SESSION['user_id']);
 	session_unset();
 }
 
 if (!isset($_SESSION['user_id'])) {
-	header("location: index.php");
+	header("location: /chatApp");
 	die();
 }
 
@@ -24,12 +40,33 @@ if (!isset($_SESSION['user_id'])) {
 	<link rel="icon" href="img/icon.png">
     <link rel="stylesheet" href="css/styles.css">
 </head>
-<body id="body" class="clearfix" onload="load_data('chat_load=1')">
+<body id="body" class="clearfix">
 	<h3 class="main_header"><a href="https://github.com/EzzatRashed/chatApp">chatApp php_ajax</a></h3>
 	<div class="chat_box">
-		<div class="people_list">
-			<div class="loader">
-				<div></div>
+		<div class="side_list">
+			<div class="Contacts_list">
+				<div class="Contacts_header clearfix">
+					<h3>Contacts</h3>
+					<input class="search" id="search_input" type="text" onkeyup="searchContacts()" placeholder="Search">
+				</div>
+				<div class="loader">
+					<div></div>
+				</div>
+				<ul id="contacts">
+					
+				</ul>
+			</div>
+			<div class="inbox">
+				<div class="inbox_header clearfix">
+					<h3>Inbox</h3>
+					<a href="<?php echo $_SERVER['PHP_SELF'].'?logout=true';?>" class="logout"><span>Sign Out</span><img src="img/logout.svg" alt="sign_out"></a>
+				</div>
+				<div class="loader">
+					<div></div>
+				</div>
+				<ul id="my_inbox">
+					
+				</ul>
 			</div>
 		</div>
 		<div id="chat">
@@ -38,18 +75,5 @@ if (!isset($_SESSION['user_id'])) {
 		</div>
 	</div>
 </body>
-<!-- <script>
-	function load_data(a) {
-		var xhttp = new XMLHttpRequest();
-		xhttp.onreadystatechange = function() {
-		if (this.readyState == 4 && this.status == 200 && this.responseText != "") {
-				document.getElementsByClassName('loader')[0].setAttribute("style","display:none;");
-		 		document.getElementById('chat_box').innerHTML = this.responseText;
-			}
-		};
-		xhttp.open("POST", "chatAPI.php", true);
-		xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-		xhttp.send(a);
-	}
-</script> -->
+<script type="text/javascript" src="js/main.js"></script>
 </html>

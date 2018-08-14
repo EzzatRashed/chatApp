@@ -43,6 +43,25 @@ h3.main_header{
 	font-size: 1.75rem;
 }
 
+ul::-webkit-scrollbar {
+    width: 8px;
+    border-radius: 3px;
+}
+
+ul::-webkit-scrollbar-track{
+    background: inherit;
+    border-radius: 3px;
+}
+
+ul::-webkit-scrollbar-thumb{
+    background: #999; 
+    border-radius: 3px;
+}
+
+ul::-webkit-scrollbar-thumb:hover{
+    background: #555; 
+}
+
 /* -- globals end here -- */
 
 /* -- login page -- */
@@ -143,18 +162,18 @@ button.submit_btn:active, button.submit_btn:focus {
 /* -- chat page -- */
 
 div.loader div{
-	border: 10px solid #fff;
-    border-top: 10px solid #43a7ff;
+    border: 5px solid #fff;
+    border-top: 5px solid #43a7ff;
     border-radius: 50%;
-    width: 80px;
-    height: 80px;
+    width: 40px;
+    height: 40px;
     -webkit-animation: spin .5s linear infinite;
     animation: spin .5s linear infinite;
 }
 
 div.loader {
     display: table;
-    margin: 100px auto;
+    margin: 65px auto;
 }
 
 @-webkit-keyframes spin {
@@ -168,19 +187,80 @@ div.loader {
 }
 
 div.chat_box{
-    margin: 0 auto 50px auto;
+    margin: 0 auto 15px auto;
 	width: 1000px;
     height: 600px;
     display: flex;
     flex-wrap: nowrap;
 }
 
-div.people_list {
+div.side_list {
     border-top-left-radius: 2px;
     border-bottom-left-radius: 2px;
-    background-color: #43a7ff;
     min-height: 120px;
     flex: 2;
+    display: flex;
+    flex-direction: column;
+    background-color: #cce5fc;
+    border: 1px solid #43a7ff;
+    border-right: 0;
+}
+
+div.Contacts_header,
+div.inbox_header{
+    padding: 5px 10px;
+    /* padding: 10px 29px 10px 20px; */
+    overflow: hidden;
+    background-color: #8ac9ff;
+}
+
+div.side_list h3{
+	display: inline-block;
+	margin: 5px 0;
+	font-weight: 400;
+}
+
+div.Contacts_list{
+	flex: 3;
+}
+
+div.inbox{
+    flex: 2;
+}
+
+input.search {
+    float: right;
+    margin: 0;
+    background: url(../img/search.svg) no-repeat 150px 10px;
+    background-size: 15px;
+    border: 0;
+    border-bottom: 1px solid #43a7ff;
+    box-shadow: none;
+    -webkit-appearance: none;
+    position: relative;
+    height: 32px;
+    width: 180px;
+    padding: 0 8px;
+    font-size: 15px;
+    color: #0a0a0a;
+    font-family: inherit;
+}
+
+a.logout{
+	float: right;
+    margin: 5px 0;
+}
+
+a.logout img{
+	display: inline-block;
+	vertical-align: middle;
+	height: 22px;
+	width: 22px;
+}
+
+a.logout span{
+	padding-right: 10px;
+    vertical-align: middle;
 }
 
 div#chat {
@@ -205,4 +285,73 @@ h2.default_h2{
 
 p.default_p{
     margin: 0 auto;
+    font-weight: 400;
+}
+
+ul#contacts,
+ul#my_inbox{
+	padding: 0;
+	margin: 0;
+	list-style-type: none;
+	overflow: auto;
+}
+
+ul#contacts{
+    max-height: 317px;
+}
+
+ul#my_inbox{
+    max-height: 196px;
+}
+
+li.contact{
+    margin: 0;
+    border-right: 1px solid #a0d2ff;
+    background-color: #a0d2ff;
+    padding: 10px;
+    width: 100%;
+    cursor: pointer;
+}
+
+li.contact:hover{
+    background-color: #fff;
+    box-shadow: 0 2px 5px 0 rgba(0,0,0,.08);
+}
+
+li.contact img{
+    display: inline-block;
+    height: 55px;
+    width: 55px;
+    border-radius: 50%;
+    border: 1px solid #43a7ff;
+    vertical-align: middle;
+}
+
+li.contact div.info{
+    display: inline-block;
+    vertical-align: middle;
+}
+
+h4.name{
+    margin: 0;
+    vertical-align: middle;
+    padding-left: 15px;
+    font-size: 18px;
+    font-weight: 500;
+}
+
+h4.status{
+    margin: 0;
+    padding-left: 15px;
+    color: #92959E;
+    font-weight: 400;
+    font-size: 12px;
+}
+
+div.status{
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    margin-right: 4px;
+    border-radius: 50%;
 }

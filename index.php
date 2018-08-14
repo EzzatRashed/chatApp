@@ -15,7 +15,7 @@ function login($user_token){
 		setcookie('MEMBER', '', strtotime('-3 days'));
 		session_unset();
 		$_SESSION['message'] = 'Login failed, please try again.';
-       	header("location: index.php");
+       	header("location: /chatApp");
 		die();
 	} else {
 		$user = $login_query->fetch(PDO::FETCH_ASSOC);
@@ -25,20 +25,19 @@ function login($user_token){
 		$_SESSION['user_age'] = $user['user_age'];
 		$_SESSION['user_gender'] = $user['user_gender'];
 
-		header("location: chat.php");
+		header("location: chat");
 		die();
 	}
 }
 /* Login Function Ends Here */
 
-
 // Check For Different Cases
 if (isset($_SESSION['user_id'])){
-	header("location: chat.php");
+	header("location: chat");
 	die();
 }
 
-if (isset($_COOKIE['MEMBER'])) {
+if (isset($_COOKIE['MEMBER']) && !empty($_COOKIE['MEMBER'])) {
 	$user_token = $_COOKIE['MEMBER'];
 	login($user_token);
 }
@@ -49,9 +48,9 @@ if (isset($_POST['submit'])) {
 	$user_age = $_POST['user_age'];
 	$user_gender = $_POST['user_gender'];
 
-	if (empty($user_name) || empty($user_age) || empty($user_age)) {
+	if (empty($user_name) || empty($user_age) || empty($user_gender)) {
 		$_SESSION['message'] = 'Please fill all fields.';
-       	header("location: index.php");
+       	header("location: /chatApp");
 		die();
 	}
 
@@ -59,7 +58,7 @@ if (isset($_POST['submit'])) {
 	$error_query->bindParam(':user_name', $user_name);
 	$error_query->execute();
 
-	if($error_query->rowCount() > 0){
+	if ($error_query->rowCount() > 0){
 		$user = $error_query->fetch(PDO::FETCH_ASSOC);
 		$user_last_active = strtotime($user['user_last_active']);
 
@@ -69,7 +68,7 @@ if (isset($_POST['submit'])) {
 			$delete_query->execute();
 		} else {
 			$_SESSION['message'] = 'This Nickname is taken.';
-	       	header("location: index.php");
+	       	header("location: /chatApp");
 			die();
 		} 
 	}
@@ -118,7 +117,7 @@ if (isset($_POST['submit'])) {
 					    <label for="user_age">Age</label>
 					    <input class="input_box" type="number" name="user_age" min="13" max="70" required>
 					    <div class="gender">
-			                <input class="radio" type="radio" name="user_gender" value="Male">
+			                <input class="radio" type="radio" name="user_gender" value="Male" required>
 			                <label class="radio" for="gender">Male</label>
 			                <input class="radio" type="radio" name="user_gender" value="Female">    
 			                <label class="radio" for="gender">Female</label>
