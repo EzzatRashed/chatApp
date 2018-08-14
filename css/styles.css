@@ -264,6 +264,7 @@ a.logout span{
 }
 
 div#chat {
+    position: relative;
     display: flex;
     flex-direction: column;
     border-top-right-radius: 2px;
@@ -288,6 +289,7 @@ p.default_p{
     font-weight: 400;
 }
 
+ul.chat, 
 ul#contacts,
 ul#my_inbox{
 	padding: 0;
@@ -306,6 +308,7 @@ ul#my_inbox{
 
 li.contact{
     margin: 0;
+    border-top: 1px solid #43a7ff;
     border-right: 1px solid #a0d2ff;
     background-color: #a0d2ff;
     padding: 10px;
@@ -354,4 +357,149 @@ div.status{
     height: 10px;
     margin-right: 4px;
     border-radius: 50%;
+}
+
+div.send_msg{
+    position: absolute;
+    bottom: 0;
+    max-height: 150px;
+    padding: 10px;
+    width: 100%;
+    background-color: #8ac9ff;
+}
+
+textarea#message_to_send{
+    width: 80%;
+    border: none;
+    padding: 5px 10px;
+    font: 14px/22px "Lato", Arial, sans-serif;
+    border-radius: 3px;
+    resize: none;
+    display: inline-block;
+    float: left;
+}
+
+/* button show_more*/
+button#send_btn{
+    font-size: 16px;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+    width: 20%;
+    background-color: inherit;
+    padding: 7px;
+    transition: .15s ease-in-out;
+    float: right;
+}
+
+button#send_btn:hover {
+    color: white;
+}
+
+ul.chat {
+    max-height: 546px;
+    padding: 20px;
+    overflow: auto;
+    position: relative;
+    width: 100%;
+}
+
+div.msg_data{
+    margin-bottom: 15px;
+}
+
+li.msg_to_me{
+    direction: ltr;
+    text-align: left;
+}
+
+li.msg_form_me{
+    direction: rtl;
+    text-align: right;
+}
+
+img.img_sender{
+    margin: 0 10px;
+    display: inline-block;
+    height: 40px;
+    width: 40px;
+    border-radius: 50%;
+    border: 1px solid #d7d7d7;
+    vertical-align: middle;
+}
+
+h4.msg_data_name{
+    padding: 0 5px;
+    display: inline-block;
+    font-weight: 400;
+    font-size: 14px;
+    margin: 0;
+    vertical-align: middle;
+}
+
+h4.msg_data_time{
+    padding: 0 5px;
+    display: inline-block;
+    vertical-align: middle;
+    font-weight: 100;
+    font-size: 12px;
+    color: grey;
+    margin: 0;
+}
+
+div.message{
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+
+    -ms-word-break: break-all;
+      /* This is the dangerous one in WebKit, as it breaks things wherever */
+    word-break: break-all;
+    /* Instead use this non-standard one: */
+    word-break: break-word;
+
+      /* Adds a hyphen where the word breaks, if supported (No Blink) */
+    -ms-hyphens: auto;
+    -moz-hyphens: auto;
+    -webkit-hyphens: auto;
+    hyphens: auto;
+
+
+    padding: 18px 20px;
+    line-height: 26px;
+    border-radius: 5px;
+    margin-bottom: 30px;
+    font-size: 14px;
+    width: 95%;
+    position: relative;
+    text-align: right;
+}
+
+div.msg_to_me{
+    background-color: #d7d7d7;
+}
+
+div.msg_form_me{
+    background-color: #a0d2ff;
+}
+
+div.message:after{
+    bottom: 100%;
+    border: solid transparent;
+    content: " ";
+    height: 0;
+    width: 0;
+    position: absolute;
+    pointer-events: none;
+    border-width: 10px;
+    margin-left: -10px;
+}
+
+div.msg_to_me:after{
+    border-bottom-color: #d7d7d7;
+    left: 4.5%;
+}
+
+div.msg_form_me:after{
+    border-bottom-color: #a0d2ff;
+    left: 95.5%;
 }

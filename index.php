@@ -54,6 +54,12 @@ if (isset($_POST['submit'])) {
 		die();
 	}
 
+	if (!preg_match("/^[a-zA-Z0-9_-]*$/",$user_name)) {
+	    $_SESSION['message'] = 'Invalid characters inserted!';
+       	header("location: /chatApp");
+		die();
+	} 
+
 	$error_query = $conn->prepare("SELECT * FROM users WHERE user_name = :user_name");
 	$error_query->bindParam(':user_name', $user_name);
 	$error_query->execute();
@@ -77,7 +83,6 @@ if (isset($_POST['submit'])) {
 	setcookie('MEMBER', $user_token, strtotime('+3 days'));
 	$sql = "INSERT INTO users (user_name, user_age, user_gender, user_token) VALUES (:user_name, :user_age, :user_gender, :user_token)";
 	$insert_query = $conn->prepare($sql);
-	$insert_query->bindParam(':user_name', $user_name);
 	$insert_query->execute(array(
 	    ':user_name'   => $user_name,
 	    ':user_age'    => $user_age,
