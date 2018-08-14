@@ -51,7 +51,7 @@ function loadContact(name) {
 	xhttp.onreadystatechange = function() {
 	if (this.readyState == 4 && this.status == 200 && this.responseText != "") {
 	 		document.getElementById('chat').innerHTML = this.responseText;
-	 		send_textarea();
+	 		sendTextarea();
 	 		var target = document.getElementById('chat_list').lastElementChild;
             target.parentNode.scrollTop = target.offsetTop;
 		}
@@ -62,7 +62,7 @@ function loadContact(name) {
 	chat_name = name;
 }
 
-function send_textarea(){
+function sendTextarea(){
     var message_to_send = document.getElementById("message_to_send");
     message_to_send.addEventListener("keypress", function(event) {
         if (event.keyCode === 13) {
@@ -73,7 +73,7 @@ function send_textarea(){
 }
 
 // API function 3
-function send_message(){
+function sendMessage(){
 	var message_to_send = document.getElementById("message_to_send");
 	var text_to_send = message_to_send.value;
     message_to_send.value = '';
@@ -96,7 +96,7 @@ function send_message(){
 }
 
 // API function 4
-function get_last_msg(){
+function getLastMsg(){
 	if (chat_name != '') {
 		var xhttp = new XMLHttpRequest();
 	    xhttp.onreadystatechange = function() {
@@ -116,6 +116,31 @@ function get_last_msg(){
 	}    
 }
 
+// API function 5
+function updateChatbox(){
+    loadSideListHTML();
+    if (chat_name != '') {
+	    var xhttp = new XMLHttpRequest();
+	    xhttp.onreadystatechange = function() {
+	    if (this.readyState == 4 && this.status == 200 && this.responseText != "") {
+	    		console.log(this.responseText);
+	            var response = this.responseText;
+	            response = response.split(',');
+	            response.splice(-1,1);
+	            var msgs = document.getElementsByClassName('msg_data_time');
+	            var num_msgs = msgs.length;
+	            response = response.splice(-num_msgs,num_msgs);
+	            for (var i = 0; i <= num_msgs - 1; i++) {
+	                document.getElementsByClassName('msg_data_time')[i].innerHTML = response[i];
+	            }
+	        }
+	    };
+	    xhttp.open("POST", "chatAPI", true);
+	    xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+	    xhttp.send("get_data_time=" + chat_name);
+	}
+}
+
 /* Functions End Here */
 
 // This block fires when the DOM is loaded
@@ -127,4 +152,5 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
 
 // Periodic Functions
-setInterval(get_last_msg, 2000); 
+setInterval(getLastMsg, 2000); 
+setInterval(updateChatbox, 5000); 

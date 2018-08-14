@@ -110,6 +110,37 @@ function generateChatHTML($msg, $msg_from, $msg_to, $msg_time, $avatar){
     </li>';
 }
 
+function updateUserLastActive($my_user_name){
+	global $conn;
+	$update_query = $conn->prepare("UPDATE users SET user_last_active = CURRENT_TIMESTAMP WHERE user_name = :my_user_name");
+	$update_query->bindParam(":my_user_name", $my_user_name);
+	$update_query->execute();
+}
+
+function checkExsistingConv($my_user_name, $other_user_name){
+	global $conn;
+
+	if ($my_user_name == $other_user_name) {
+		return;
+	}
+
+	// Ensure User Exsists
+	$sql = "SELECT * FROM users WHERE user_name = :other_user_name";
+	$user = selectQuery($sql, ':other_user_name', $other_user_name);
+
+	if (empty($user)){
+		return;
+	} 
+
+	// Check Exsisting Conversation
+	$sql = "SELECT * FROM conversations WHERE (conv_username1 = :my_user_name AND conv_username2 = :other_user_name) OR (conv_username1 = :other_user_name AND conv_username2 = :my_user_name) LIMIT 1";
+	$conv_query = $conn->prepare($sql);
+	$conv_query->bindParam(":my_user_name", $my_user_name);
+	$conv_query->bindParam(":other_user_name", $other_user_name);
+	$conv_query->execute();
+	return $conv_query->fetch(PDO::FETCH_ASSOC);
+}
+
 /* Functions End Here */
 
 // Prevent Direct Access to this File
@@ -175,13 +206,9 @@ if (isset($_SESSION['user_id']) && isset($_POST['load_chat']) && !empty($_POST['
 	$my_user_name = $_SESSION['user_name'];
 	$other_user_name = $_POST['load_chat'];
 
-	$sql = "SELECT * FROM conversations WHERE (conv_username1 = :my_user_name AND conv_username2 = :other_user_name) OR (conv_username1 = :other_user_name AND conv_username2 = :my_user_name) LIMIT 1";
-	$conv_query = $conn->prepare($sql);
-	$conv_query->bindParam(":my_user_name", $my_user_name);
-	$conv_query->bindParam(":other_user_name", $other_user_name);
-	$conv_query->execute();
+	$conv_query = checkExsistingConv($my_user_name, $other_user_name);
 	echo '<ul id="chat_list" class="chat">';
-	if($conv_query->rowCount() == 0){
+	if(empty($conv_query)){
 		echo '
 		<div id="empty">
 			<h2 class="default_h2">No Messages Yet!</h2>
@@ -189,8 +216,7 @@ if (isset($_SESSION['user_id']) && isset($_POST['load_chat']) && !empty($_POST['
 		</div>
 		';
 	} else {
-		$conv = $conv_query->fetch(PDO::FETCH_ASSOC);
-		$conv_token = $conv['conv_token'];
+		$conv_token = $conv_query['conv_token'];
 		$sql = "SELECT * FROM messages WHERE conv_token = :conv_token";
 		$messages = selectQuery($sql, ':conv_token', $conv_token);
 		foreach ($messages as $message) {
@@ -207,42 +233,28 @@ if (isset($_SESSION['user_id']) && isset($_POST['load_chat']) && !empty($_POST['
 			}
 			echo generateChatHTML($msg, $msg_from, $msg_to, $msg_time, $avatar);
 		}
-
 	}
 	echo '
 	</ul>
 	<div class="send_msg">
 		<textarea name="message_to_send" id="message_to_send" placeholder="Type a new message .." rows="1"></textarea>
-		<button id="send_btn" onclick="send_message()">SEND</button>
+		<button id="send_btn" onclick="sendMessage()">SEND</button>
 	</div>
 	';
+
+	// Update user_last_active Column
+	updateUserLastActive($my_user_name);
 }
 
-// Response to send_message() AJAX Call
+// Response to sendMessage() AJAX Call
 if (isset($_SESSION['user_id']) && isset($_POST['msg']) && isset($_POST['to']) && !empty($_POST['msg']) && !empty($_POST['to'])) {
 	$my_user_name = $_SESSION['user_name'];
 	$other_user_name = $_POST['to'];
 	$msg_body = htmlspecialchars($_POST['msg']);
 
-	if ($my_user_name == $other_user_name) {
-		die();
-	}
-
-	// Ensure User Exsists
-	$sql = "SELECT * FROM users WHERE user_name = :other_user_name";
-	$user = selectQuery($sql, ':other_user_name', $other_user_name);
-
-	if (empty($user)){
-		die();
-	} 
-
 	// Check For Exsisting Conversation
-	$sql = "SELECT * FROM conversations WHERE (conv_username1 = :my_user_name AND conv_username2 = :other_user_name) OR (conv_username1 = :other_user_name AND conv_username2 = :my_user_name) LIMIT 1";
-	$conv_query = $conn->prepare($sql);
-	$conv_query->bindParam(":my_user_name", $my_user_name);
-	$conv_query->bindParam(":other_user_name", $other_user_name);
-	$conv_query->execute();
-	if($conv_query->rowCount() == 0){
+	$conv_query = checkExsistingConv($my_user_name, $other_user_name);
+	if(empty($conv_query)){
 		$conv_token = bin2hex(random_bytes(20));
 		$sql = "INSERT INTO conversations (conv_token, conv_username1, conv_username2) VALUES (:conv_token, :conv_username1, :conv_username2)";
 		$insert_query = $conn->prepare($sql);
@@ -252,8 +264,7 @@ if (isset($_SESSION['user_id']) && isset($_POST['msg']) && isset($_POST['to']) &
 		    ':conv_username2' => $other_user_name,
 	    ));
 	} else {
-		$conv = $conv_query->fetch(PDO::FETCH_ASSOC);
-		$conv_token = $conv['conv_token'];
+		$conv_token = $conv_query['conv_token'];
 	}
 
 	// Insert Message Query 
@@ -268,9 +279,12 @@ if (isset($_SESSION['user_id']) && isset($_POST['msg']) && isset($_POST['to']) &
 
 	// Receive Formatted Message
 	echo generateChatHTML($msg_body, $my_user_name, $other_user_name, formatTimeString(date("Y-m-j H:i:s")), getAvatar($_SESSION['user_gender']));
+
+	// Update user_last_active Column
+	updateUserLastActive($my_user_name);
 }
 
-// Response to get_last_msg() AJAX Call
+// Response to getLastMsg() AJAX Call
 if (isset($_SESSION['user_id']) && isset($_POST['get_msg_from']) && !empty($_POST['get_msg_from'])){
 	$other_user_name = $_POST['get_msg_from'];
 
@@ -295,6 +309,28 @@ if (isset($_SESSION['user_id']) && isset($_POST['get_msg_from']) && !empty($_POS
 
 		$update_query = $conn->prepare("UPDATE messages SET msg_seen = '1' WHERE msg_id='$msg_id'");
 		$update_query->execute();
+	}
+}
+
+// Response to updateChatbox() AJAX Call
+if (isset($_SESSION['user_id']) && isset($_POST['get_data_time']) && !empty($_POST['get_data_time'])){
+	$my_user_name = $_SESSION['user_name'];
+	$other_user_name = $_POST['get_data_time'];
+
+	// Check For Exsisting Conversation
+	$conv_query = checkExsistingConv($my_user_name, $other_user_name);
+	if(empty($conv_query)){
+		die();
+	} else {
+		$conv_token = $conv_query['conv_token'];
+	}
+
+	$sql = "SELECT * FROM messages where conv_token = :conv_token ORDER BY msg_id";
+	$messages = selectQuery($sql, ':conv_token', $conv_token);
+	foreach ($messages as $message) {
+		$msg_data_time = formatTimeString($message['msg_date_time']);
+
+		echo $msg_data_time.',';
 	}
 }
 
