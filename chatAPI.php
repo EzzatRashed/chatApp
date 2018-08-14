@@ -170,6 +170,7 @@ if (isset($_SESSION['user_id']) && isset($_POST['load_side_list']) && $_POST['lo
 	}
 }
 
+// Response to loadContact() AJAX Call
 if (isset($_SESSION['user_id']) && isset($_POST['load_chat']) && !empty($_POST['load_chat'])) {
 	$my_user_name = $_SESSION['user_name'];
 	$other_user_name = $_POST['load_chat'];
@@ -189,19 +190,35 @@ if (isset($_SESSION['user_id']) && isset($_POST['load_chat']) && !empty($_POST['
 		';
 	} else {
 		$conv = $conv_query->fetch(PDO::FETCH_ASSOC);
-		/*
-		**
-		*/
+		$conv_token = $conv['conv_token'];
+		$sql = "SELECT * FROM messages WHERE conv_token = :conv_token";
+		$messages = selectQuery($sql, ':conv_token', $conv_token);
+		foreach ($messages as $message) {
+			$msg = $message['msg_body'];
+			$msg_from = $message['msg_from'];
+			$msg_to = $message['msg_to'];
+			$msg_time = formatTimeString($message['msg_date_time']);
+			if ($msg_from == $my_user_name) {
+				$avatar = getAvatar($_SESSION['user_gender']);
+			} elseif ($msg_from == $other_user_name) {
+				$sql = "SELECT * FROM users WHERE user_name = :user_name";
+				$contact = selectQuery($sql, ':user_name', $other_user_name);
+				$avatar = getAvatar($contact[0]['user_gender']);
+			}
+			echo generateChatHTML($msg, $msg_from, $msg_to, $msg_time, $avatar);
+		}
+
 	}
 	echo '
 	</ul>
 	<div class="send_msg">
 		<textarea name="message_to_send" id="message_to_send" placeholder="Type a new message .." rows="1"></textarea>
-		<button id="send_btn" onclick="send_message('."'".$other_user_name ."'".')">SEND</button>
+		<button id="send_btn" onclick="send_message()">SEND</button>
 	</div>
 	';
 }
 
+// Response to send_message() AJAX Call
 if (isset($_SESSION['user_id']) && isset($_POST['msg']) && isset($_POST['to']) && !empty($_POST['msg']) && !empty($_POST['to'])) {
 	$my_user_name = $_SESSION['user_name'];
 	$other_user_name = $_POST['to'];
@@ -251,6 +268,34 @@ if (isset($_SESSION['user_id']) && isset($_POST['msg']) && isset($_POST['to']) &
 
 	// Receive Formatted Message
 	echo generateChatHTML($msg_body, $my_user_name, $other_user_name, formatTimeString(date("Y-m-j H:i:s")), getAvatar($_SESSION['user_gender']));
+}
+
+// Response to get_last_msg() AJAX Call
+if (isset($_SESSION['user_id']) && isset($_POST['get_msg_from']) && !empty($_POST['get_msg_from'])){
+	$other_user_name = $_POST['get_msg_from'];
+
+	$sql = "SELECT * FROM users WHERE user_name = :user_name";
+	$contact = selectQuery($sql, ':user_name', $other_user_name);
+
+	if (empty($contact)){
+		die();
+	} 
+
+	$avatar = getAvatar($contact[0]['user_gender']);
+	$sql = "SELECT * FROM messages WHERE msg_from = :other_user_name AND msg_seen = '0'";
+	$messages = selectQuery($sql, ':other_user_name', $other_user_name);
+	foreach ($messages as $message) {
+		$msg_id = $message['msg_id'];
+		$msg = $message['msg_body'];
+		$msg_from = $message['msg_from'];
+		$msg_to = $message['msg_to'];
+		$msg_time = formatTimeString($message['msg_date_time']);
+
+		echo generateChatHTML($msg, $msg_from, $msg_to, $msg_time, $avatar);
+
+		$update_query = $conn->prepare("UPDATE messages SET msg_seen = '1' WHERE msg_id='$msg_id'");
+		$update_query->execute();
+	}
 }
 
 ?>

@@ -1,3 +1,5 @@
+var chat_name = '';
+
 /* Functions */
 
 function searchContacts(){
@@ -25,6 +27,7 @@ function searchContacts(){
     }
 }
 
+// API function 1
 function loadSideListHTML() {
 	var HTML_Response;
   	var xhttp = new XMLHttpRequest();
@@ -41,6 +44,7 @@ function loadSideListHTML() {
 	xhttp.send("load_side_list=true");
 }
 
+// API function 2
 function loadContact(name) {
 	document.getElementById('chat').innerHTML = '<div class="loader"><div></div></div>';
   	var xhttp = new XMLHttpRequest();
@@ -48,11 +52,14 @@ function loadContact(name) {
 	if (this.readyState == 4 && this.status == 200 && this.responseText != "") {
 	 		document.getElementById('chat').innerHTML = this.responseText;
 	 		send_textarea();
+	 		var target = document.getElementById('chat_list').lastElementChild;
+            target.parentNode.scrollTop = target.offsetTop;
 		}
 	};
 	xhttp.open("POST", "chatAPI", true);
 	xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
 	xhttp.send("load_chat=" + name);
+	chat_name = name;
 }
 
 function send_textarea(){
@@ -65,7 +72,8 @@ function send_textarea(){
     });
 }
 
-function send_message(a){
+// API function 3
+function send_message(){
 	var message_to_send = document.getElementById("message_to_send");
 	var text_to_send = message_to_send.value;
     message_to_send.value = '';
@@ -74,7 +82,7 @@ function send_message(a){
         xhttp.onreadystatechange = function() {
         if (this.readyState == 4 && this.status == 200 && this.responseText != "") {
                 document.getElementById('chat_list').insertAdjacentHTML('beforeend', this.responseText);
-                var target = document.getElementById('chat_list').lastChild;
+                var target = document.getElementById('chat_list').lastElementChild;
                 target.parentNode.scrollTop = target.offsetTop;
                 if (document.body.contains(document.getElementById('empty')) && document.getElementById('empty').getAttribute("style") != "display:none;") {
                     document.getElementById('empty').setAttribute("style","display:none;");
@@ -83,8 +91,29 @@ function send_message(a){
         };
         xhttp.open("POST", "chatAPI", true);
         xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-        xhttp.send("msg=" + text_to_send + "&to=" + a);
+        xhttp.send("msg=" + text_to_send + "&to=" + chat_name);
 	}
+}
+
+// API function 4
+function get_last_msg(){
+	if (chat_name != '') {
+		var xhttp = new XMLHttpRequest();
+	    xhttp.onreadystatechange = function() {
+	    if (this.readyState == 4 && this.status == 200 && this.responseText != "") {
+	            if (document.body.contains(document.getElementById('empty')) && document.getElementById('empty').getAttribute("style") != "display:none;") {
+	                document.getElementById('empty').setAttribute("style","display:none;");
+	            }
+	            document.getElementById('chat_list').insertAdjacentHTML('beforeend', this.responseText);
+	            var target = document.getElementById('chat_list').lastElementChild;
+	            target.parentNode.scrollTop = target.offsetTop;
+	            new Audio('sound/new_msg.mp3').play()
+	        }
+	    };
+	    xhttp.open("POST", "chatAPI", true);
+	    xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+	    xhttp.send("get_msg_from=" + chat_name);
+	}    
 }
 
 /* Functions End Here */
@@ -95,3 +124,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 	document.getElementsByClassName('loader')[0].setAttribute("style","display:none;");
 	document.getElementsByClassName('loader')[1].setAttribute("style","display:none;");
 });
+
+
+// Periodic Functions
+setInterval(get_last_msg, 2000); 

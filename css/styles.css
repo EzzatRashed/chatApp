@@ -429,6 +429,7 @@ img.img_sender{
 }
 
 h4.msg_data_name{
+    direction: ltr;
     padding: 0 5px;
     display: inline-block;
     font-weight: 400;
@@ -438,6 +439,7 @@ h4.msg_data_name{
 }
 
 h4.msg_data_time{
+    direction: ltr;
     padding: 0 5px;
     display: inline-block;
     vertical-align: middle;
@@ -475,7 +477,7 @@ div.message{
 }
 
 div.msg_to_me{
-    background-color: #d7d7d7;
+    background-color: #cce5fc;
 }
 
 div.msg_form_me{
@@ -495,7 +497,7 @@ div.message:after{
 }
 
 div.msg_to_me:after{
-    border-bottom-color: #d7d7d7;
+    border-bottom-color: #cce5fc;
     left: 4.5%;
 }
 
