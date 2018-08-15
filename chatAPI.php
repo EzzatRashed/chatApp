@@ -10,6 +10,8 @@ If you want to use JSON to reduce server traffic, you can use any of those libra
 3 - JsRender -- https://github.com/BorisMoore/jsrender
 4 - Or you can use ES6's template litrals, but still not supported in all browsers.
 
+EDIT: Okay, obviously using pure javascript wasn't the best idea. :(
+
 */
 
 // Session Start and Require DataBase PDO
@@ -230,15 +232,26 @@ if (isset($_SESSION['user_id']) && isset($_POST['load_chat']) && !empty($_POST['
 				$sql = "SELECT * FROM users WHERE user_name = :user_name";
 				$contact = selectQuery($sql, ':user_name', $other_user_name);
 				$avatar = getAvatar($contact[0]['user_gender']);
+			} else {
+				die();
 			}
 			echo generateChatHTML($msg, $msg_from, $msg_to, $msg_time, $avatar);
 		}
 	}
 	echo '
 	</ul>
+	<div id="emojis_menu" class="clearfix" style="display:none;">';
+	$emojis_array = array('😂','🤣','😀','😁','😃','😄','😅','😆' ,'😉' ,'😊' ,'😋' ,'😎','😍' ,'😘' ,'😗' ,'😙' ,'😚' ,'🙂' ,'🤗' ,'🤩' ,'🤔' ,'🤨' ,'😐' ,'😑' ,'😶' ,'🙄' ,'😏' ,'😣' ,'😥' ,'😮' ,'🤐' ,'😯' ,'😪' ,'😫' ,'😴' ,'😌' ,'😛' ,'😜' ,'😝' ,'🤤' ,'😒' ,'😓' ,'😔' ,'😕' ,'🙃' ,'🤑','😲','☹','🙁' ,'😖' ,'😞' ,'😟' ,'😤' ,'😢' ,'😭' ,'😦','😧','😨' ,'😩' ,'🤯','😬','😰' ,'😱' ,'😳' ,'🤪' ,'😵' ,'😡' ,'😠' ,'🤬' ,'😷' ,'🤒' ,'🤕' ,'🤢' ,'🤮' ,'🤧' ,'😇' ,'🤠' ,'🤡' ,'🤥' ,'🤫' ,'🤭' ,'🧐' ,'🤓' ,'😈' ,'👿' ,'👹' ,'👺','💀','👻' ,'👽','🤖' ,'💩','😺','😸','😹' ,'😻' ,'😼' ,'😽' ,'🙀' ,'😿' ,'😾');
+	foreach ($emojis_array as $emoji) {
+		echo '<span class="emojis_menu_element">'.$emoji.'</span>';
+	}
+	echo '
+	</div>
 	<div class="send_msg">
 		<textarea name="message_to_send" id="message_to_send" placeholder="Type a new message .." rows="1"></textarea>
 		<button id="send_btn" onclick="sendMessage()">SEND</button>
+		<img src="img/emoji.png" id="emojis_button" onclick="emojisMenu();">
+		<img src="img/image.svg" id="send_pic">
 	</div>
 	';
 
@@ -251,6 +264,7 @@ if (isset($_SESSION['user_id']) && isset($_POST['msg']) && isset($_POST['to']) &
 	$my_user_name = $_SESSION['user_name'];
 	$other_user_name = $_POST['to'];
 	$msg_body = htmlspecialchars($_POST['msg']);
+	$msg_body = preg_replace('#&lt;(/?(?:span))&gt;#', '<\1>', $msg_body); // Allow span to pass
 
 	// Check For Exsisting Conversation
 	$conv_query = checkExsistingConv($my_user_name, $other_user_name);
