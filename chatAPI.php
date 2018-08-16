@@ -100,6 +100,8 @@ function generateChatHTML($msg, $msg_from, $msg_to, $msg_time, $avatar){
 		$class = 'msg_form_me';
 	} elseif ($msg_to == $_SESSION['user_name']) {
 		$class = 'msg_to_me';
+	} else {
+		return;
 	}
 
 	echo '
@@ -110,6 +112,14 @@ function generateChatHTML($msg, $msg_from, $msg_to, $msg_time, $avatar){
 		</div>
         <div class="message '.$class.'">'.$msg.'</div>
     </li>';
+}
+
+function generateErrorHTML($error_msg){
+	return '
+	<li class="error_msg">
+		<h4>'.$error_msg.'</h4>
+	</li>
+	';
 }
 
 function updateUserLastActive($my_user_name){
@@ -153,7 +163,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET' && realpath(__FILE__) == realpath($_SERV
 
 // Response to loadSideListHTML() AJAX Call
 if (isset($_SESSION['user_id']) && isset($_POST['load_side_list']) && $_POST['load_side_list'] == true) {
-		$my_user_name = $_SESSION['user_name'];
+	$my_user_name = $_SESSION['user_name'];
 
 	$sql = "SELECT * FROM users ORDER BY user_last_active DESC";
 	$contacts = selectQuery($sql, '', '');
@@ -222,6 +232,7 @@ if (isset($_SESSION['user_id']) && isset($_POST['load_chat']) && !empty($_POST['
 		$sql = "SELECT * FROM messages WHERE conv_token = :conv_token";
 		$messages = selectQuery($sql, ':conv_token', $conv_token);
 		foreach ($messages as $message) {
+			$msg_id = $message['msg_id'];
 			$msg = $message['msg_body'];
 			$msg_from = $message['msg_from'];
 			$msg_to = $message['msg_to'];
@@ -232,6 +243,8 @@ if (isset($_SESSION['user_id']) && isset($_POST['load_chat']) && !empty($_POST['
 				$sql = "SELECT * FROM users WHERE user_name = :user_name";
 				$contact = selectQuery($sql, ':user_name', $other_user_name);
 				$avatar = getAvatar($contact[0]['user_gender']);
+				$update_query = $conn->prepare("UPDATE messages SET msg_seen = '1' WHERE msg_id='$msg_id'");
+				$update_query->execute();
 			} else {
 				die();
 			}
@@ -240,18 +253,26 @@ if (isset($_SESSION['user_id']) && isset($_POST['load_chat']) && !empty($_POST['
 	}
 	echo '
 	</ul>
+	<div id="img_upload_bar" style="display:none;">
+		<h4 id="image_name"></h4>
+	</div>
 	<div id="emojis_menu" class="clearfix" style="display:none;">';
 	$emojis_array = array('😂','🤣','😀','😁','😃','😄','😅','😆' ,'😉' ,'😊' ,'😋' ,'😎','😍' ,'😘' ,'😗' ,'😙' ,'😚' ,'🙂' ,'🤗' ,'🤩' ,'🤔' ,'🤨' ,'😐' ,'😑' ,'😶' ,'🙄' ,'😏' ,'😣' ,'😥' ,'😮' ,'🤐' ,'😯' ,'😪' ,'😫' ,'😴' ,'😌' ,'😛' ,'😜' ,'😝' ,'🤤' ,'😒' ,'😓' ,'😔' ,'😕' ,'🙃' ,'🤑','😲','☹','🙁' ,'😖' ,'😞' ,'😟' ,'😤' ,'😢' ,'😭' ,'😦','😧','😨' ,'😩' ,'🤯','😬','😰' ,'😱' ,'😳' ,'🤪' ,'😵' ,'😡' ,'😠' ,'🤬' ,'😷' ,'🤒' ,'🤕' ,'🤢' ,'🤮' ,'🤧' ,'😇' ,'🤠' ,'🤡' ,'🤥' ,'🤫' ,'🤭' ,'🧐' ,'🤓' ,'😈' ,'👿' ,'👹' ,'👺','💀','👻' ,'👽','🤖' ,'💩','😺','😸','😹' ,'😻' ,'😼' ,'😽' ,'🙀' ,'😿' ,'😾');
+
+
 	foreach ($emojis_array as $emoji) {
 		echo '<span class="emojis_menu_element">'.$emoji.'</span>';
 	}
 	echo '
 	</div>
 	<div class="send_msg">
-		<textarea name="message_to_send" id="message_to_send" placeholder="Type a new message .." rows="1"></textarea>
-		<button id="send_btn" onclick="sendMessage()">SEND</button>
-		<img src="img/emoji.png" id="emojis_button" onclick="emojisMenu();">
-		<img src="img/image.svg" id="send_pic">
+		<form <form onsubmit="return sendMessage(this);">
+			<textarea name="message_to_send" id="message_to_send" placeholder="Type a new message .." rows="1"></textarea>
+			<button id="send_btn" name="submit">SEND</button>
+			<img src="img/emoji.png" id="emojis_button" onclick="emojisMenu();">
+			<label for="img_to_upload" id="send_pic"><img src="img/image.svg" id="send_pic"></label>
+			<input style="display: none;" type="file" name="img_to_upload" id="img_to_upload" onchange="imageBar(this.files)">
+		</form>
 	</div>
 	';
 
@@ -260,11 +281,51 @@ if (isset($_SESSION['user_id']) && isset($_POST['load_chat']) && !empty($_POST['
 }
 
 // Response to sendMessage() AJAX Call
-if (isset($_SESSION['user_id']) && isset($_POST['msg']) && isset($_POST['to']) && !empty($_POST['msg']) && !empty($_POST['to'])) {
+if (isset($_SESSION['user_id']) && isset($_POST['to']) && !empty($_POST['to']) || isset($_SESSION['user_id']) && isset($_SERVER['HTTP_TO']) && !empty($_SERVER['HTTP_TO'])) {
 	$my_user_name = $_SESSION['user_name'];
-	$other_user_name = $_POST['to'];
-	$msg_body = htmlspecialchars($_POST['msg']);
-	$msg_body = preg_replace('#&lt;(/?(?:span))&gt;#', '<\1>', $msg_body); // Allow span to pass
+	if (isset($_POST['msg']) && !empty($_POST['msg'])) {
+		$other_user_name = $_POST['to'];		
+		$msg_body = htmlspecialchars($_POST['msg']);
+		$msg_body = preg_replace('#&lt;(/?(?:span))&gt;#', '<\1>', $msg_body); // Allow span to pass
+	} elseif (isset($_FILES['img_to_upload']) && !empty($_FILES['img_to_upload']) && isset($_SERVER['HTTP_TO']) && !empty($_SERVER['HTTP_TO'])) {
+		$other_user_name = $_SERVER['HTTP_TO'];
+
+		$img_array = $_FILES['img_to_upload'];
+    	$image_name = $img_array['name'];
+   		$image_tmp_name = $img_array['tmp_name'];
+  	    $image_size = $img_array['size'];
+   		$image_error = $img_array['error'];
+   		$image_ext = explode('.', $image_name);
+	    $image_actual_ext = strtolower(end($image_ext));
+	    $allowed = array('jpg', 'jpeg', 'png','');
+	    $inarray = in_array($image_actual_ext, $allowed);
+	    if (!$inarray == true) {
+	    	$error_msg = 'This file extension is not allowed.';
+	   		echo generateErrorHTML($error_msg);
+	   		die();
+	    }
+        if (!$image_error === 0) {
+        	$error_msg = 'There was an error uploading the image.';
+	      	echo generateErrorHTML($error_msg);
+	   		die();
+        }
+        if ($image_size > 5000000) {
+        	$error_msg = 'This image exceeded the size limit 5MB.';
+      		echo generateErrorHTML($error_msg);
+	   		die();
+        }
+		
+			
+		if ($image_name != "") {
+			$image_name_new = uniqid('', true).".".$image_actual_ext;
+        	$image_destination = 'uploads/'.$image_name_new;
+        	move_uploaded_file($image_tmp_name, $image_destination);
+        }
+
+		$msg_body = '<img class="uploaded_img" src="'.$image_destination.'">';	
+	} else {
+		die();
+	}
 
 	// Check For Exsisting Conversation
 	$conv_query = checkExsistingConv($my_user_name, $other_user_name);

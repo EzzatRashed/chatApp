@@ -412,7 +412,9 @@ button#send_btn:hover {
     background-color: #48abff;
 }
 
+div#img_upload_bar,
 div#emojis_menu{
+    word-wrap: break-word;
     position: absolute;
     bottom: 52px;
     width: 90%;
@@ -420,6 +422,18 @@ div#emojis_menu{
     border-bottom: 0;
     background-color: #f3f9ff;
     padding: 10px;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+div#img_upload_bar{
+    width: 100%;
+    border-right: 0;
+    padding-left: 10px;
 }
 
 span.emojis_menu_element{
@@ -545,4 +559,29 @@ div.msg_to_me:after{
 div.msg_form_me:after{
     border-bottom-color: #a0d2ff;
     left: 95.5%;
+}
+
+img.uploaded_img{
+    max-width: 340px; /* ie */
+    max-width: -webkit-fill-available;
+}
+
+li.error_msg{
+    background-color: #ffdddd;
+    border-left: 6px solid #f44336;
+    padding-left: 10px;
+    margin-bottom: 10px;
+}
+
+h4#image_name,
+li.error_msg h4{
+    margin:  0;
+    padding:  10px;
+    font-weight: 500;
+}
+    
+span#remove_btn{
+    cursor: pointer;
+    color: #43a7ff;
+    padding-left: 30px;
 }
