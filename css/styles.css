@@ -343,6 +343,11 @@ h4.name{
     font-weight: 500;
 }
 
+h4.new_msgs{
+    font-weight: 700;
+    font-style: italic;
+}
+
 h4.status{
     margin: 0;
     padding-left: 15px;
@@ -464,8 +469,19 @@ li.msg_to_me{
 }
 
 li.msg_form_me{
+    position: relative;
     direction: rtl;
     text-align: right;
+}
+
+/* msg seen */ 
+li.msg_form_me span{
+    font-weight: 900;
+    font-size: 30px;
+    color: #00bc44;
+    position: absolute;
+    bottom: 0;
+    left: 0;
 }
 
 img.img_sender{
@@ -520,7 +536,7 @@ div.message{
     padding: 18px 20px;
     line-height: 26px;
     border-radius: 5px;
-    margin-bottom: 30px;
+    margin-bottom: 15px;
     font-size: 14px;
     width: 95%;
     position: relative;

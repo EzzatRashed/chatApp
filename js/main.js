@@ -1,4 +1,5 @@
 var chat_name = '';
+var getMsgStatusEnabled = false;
 
 /* Functions */
 
@@ -38,12 +39,31 @@ function sendTextarea(){
 }
 
 function emojisMenu() {
-	//var emojis_button = document.getElementById("emojis_button");
 	var emojis_menu = document.getElementById("emojis_menu");
 	if (emojis_menu.style.display == 'block') {
 		emojis_menu.style.display = 'none';
 	} else {
 		emojis_menu.style.display = 'block';
+	}
+}
+
+function getMsgStatus(){
+	if (getMsgStatusEnabled == true) {
+		var my_last_msg = document.getElementsByClassName('message msg_form_me');
+		my_last_msg = document.getElementsByClassName('message msg_form_me')[my_last_msg.length - 1];
+	  	var xhttp = new XMLHttpRequest();
+		xhttp.onreadystatechange = function() {
+			if (this.readyState == 4 && this.status == 200 && this.responseText == "seen") {
+				if (document.body.contains(document.getElementById('seen'))){
+					document.getElementById('seen').parentNode.removeChild(document.getElementById('seen'));
+				}
+				my_last_msg.insertAdjacentHTML('beforebegin', '<span id="seen">✓</span>');
+				getMsgStatusEnabled = false;
+			}
+		};
+		xhttp.open("POST", "chatAPI", true);
+		xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+		xhttp.send("get_msg_status=" + chat_name);
 	}
 }
 
@@ -105,6 +125,18 @@ function loadContact(name) {
 	 		sendTextarea();
 	 		var target = document.getElementById('chat_list').lastElementChild;
             target.parentNode.scrollTop = target.offsetTop;
+            loadSideListHTML();
+            if (document.body.contains(document.getElementsByClassName('message msg_form_me')[0])) {
+            	var my_last_msg = document.getElementsByClassName('message msg_form_me');
+				my_last_msg = document.getElementsByClassName('message msg_form_me')[my_last_msg.length - 1];
+
+				var last_msg = document.getElementsByClassName('message');
+				last_msg = document.getElementsByClassName('message')[last_msg.length - 1];
+				if (my_last_msg == last_msg) {
+					getMsgStatusEnabled = true;
+					getMsgStatus();
+				}
+            }
 		}
 	};
 	xhttp.open("POST", "chatAPI", true);
@@ -141,6 +173,7 @@ function sendMessage(oFormElement){
         xhttp.open("POST", "chatAPI", true);
         xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
         xhttp.send("msg=" + text_to_send + "&to=" + chat_name);
+        getMsgStatusEnabled = true;
 	}
 	if (img_to_upload.length == 1) {
 		// Upload an Image
@@ -179,7 +212,7 @@ function sendMessage(oFormElement){
 	        };
 
 			xhttp.send (formData);
-
+			getMsgStatusEnabled = true;
 		}
 	}
 
@@ -195,10 +228,14 @@ function getLastMsg(){
 	            if (document.body.contains(document.getElementById('empty')) && document.getElementById('empty').getAttribute("style") != "display:none;") {
 	                document.getElementById('empty').setAttribute("style","display:none;");
 	            }
+	            if (document.body.contains(document.getElementById('seen'))){
+					document.getElementById('seen').parentNode.removeChild(document.getElementById('seen'));
+				}
 	            document.getElementById('chat_list').insertAdjacentHTML('beforeend', this.responseText);
 	            var target = document.getElementById('chat_list').lastElementChild;
 	            target.parentNode.scrollTop = target.offsetTop;
-	            new Audio('sound/new_msg.mp3').play()
+	            new Audio('sound/new_msg.mp3').play();
+	            getMsgStatusEnabled = false;
 	        }
 	    };
 	    xhttp.open("POST", "chatAPI", true);
@@ -243,4 +280,5 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
 // Periodic Functions
 setInterval(getLastMsg, 2000); 
+setInterval(getMsgStatus, 2000);
 setInterval(updateChatbox, 5000); 

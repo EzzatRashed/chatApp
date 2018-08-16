@@ -68,9 +68,25 @@ function selectQuery($sql, $param1, $param2) {
     return $query->fetchAll(PDO::FETCH_ASSOC);
 }
 
-function generateSideListHTML($contact){
+function generateSideListHTML($contact, $inbox){
 	if ($contact['user_id'] == $_SESSION['user_id']) {
 		return;
+	}
+
+	$inbox_msgs = '';
+	$new_msgs = '';
+	if ($inbox == true) {
+		global $conn;
+		$sql = "SELECT * FROM messages WHERE msg_from = :other_user_name AND msg_to = :my_user_name AND msg_seen = '0'";
+		$msgs = $conn->prepare($sql);
+		$msgs->bindParam(':other_user_name', $contact['user_name']);
+		$msgs->bindParam(':my_user_name', $_SESSION['user_name']);
+		$msgs->execute();
+		$msgs = $msgs->fetchAll(PDO::FETCH_ASSOC);
+		if (count($msgs) > 0) {
+			$inbox_msgs = '<span style="color:#ff4f4f; font-size:15px; font-weight:700;"> ('.count($msgs).')</span>';
+			$new_msgs = 'new_msgs';
+		}
 	}
 
 	$time_now = strtotime(date("Y-m-j H:i:s"));
@@ -88,7 +104,7 @@ function generateSideListHTML($contact){
 	<li class="contact" onclick="loadContact('."'".$contact['user_name']."'".');" data-name="'.$contact['user_name'].'">
 		<img src="'.getAvatar($contact['user_gender']).'" alt="'.$contact['user_name'].'">
 		<div class="info">
-			<h4 class="name">'.$contact['user_name'].' - <span style="font-size:12px;">'.$contact['user_age'].' yo</span></h4>
+			<h4 class="name '.$new_msgs.'">'.$contact['user_name'].' - <span style="font-size:12px;">'.$contact['user_age'].' yo </span>'.$inbox_msgs.'</h4>
 			<h4 class="status"><div class="status" style="background-color:'.$color.'"></div>'.$status.'</h4>
 		</div>
 	</li>
@@ -184,7 +200,7 @@ if (isset($_SESSION['user_id']) && isset($_POST['load_side_list']) && $_POST['lo
 		';
 	} else {
 		foreach($contacts as $contact) {
-			echo generateSideListHTML($contact);
+			echo generateSideListHTML($contact, false);
 		}
 	}
 
@@ -208,7 +224,7 @@ if (isset($_SESSION['user_id']) && isset($_POST['load_side_list']) && $_POST['lo
 			}
 			$sql = "SELECT * FROM users WHERE user_name = :user_name";
 			$contact = selectQuery($sql, ':user_name', $other_user_name);
-		    echo generateSideListHTML($contact[0]);
+		    echo generateSideListHTML($contact[0], true);
 		}
 	}
 }
@@ -406,6 +422,27 @@ if (isset($_SESSION['user_id']) && isset($_POST['get_data_time']) && !empty($_PO
 		$msg_data_time = formatTimeString($message['msg_date_time']);
 
 		echo $msg_data_time.',';
+	}
+}
+
+// Response to getMsgStatus() AJAX Call
+if (isset($_SESSION['user_id']) && isset($_POST['get_msg_status']) && !empty($_POST['get_msg_status'])){
+	$my_user_name = $_SESSION['user_name'];
+	$other_user_name = $_POST['get_msg_status'];
+
+	// Check For Exsisting Conversation
+	$conv_query = checkExsistingConv($my_user_name, $other_user_name);
+	if(empty($conv_query)){
+		die();
+	} else {
+		$conv_token = $conv_query['conv_token'];
+	}
+
+	$sql = "SELECT * FROM messages where conv_token = :conv_token ORDER BY msg_id DESC LIMIT 1";
+	$message = selectQuery($sql, ':conv_token', $conv_token);
+
+	if ($message[0]['msg_seen'] == 1) {
+		echo 'seen';
 	}
 }
 
