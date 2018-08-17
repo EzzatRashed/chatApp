@@ -8,6 +8,6 @@
 </head>
 <body>
 	<h3 class="main_header"><a href="https://github.com/EzzatRashed/chatApp">chatApp php_ajax</a></h3>
-	<h2 class="main_header" style="font-size: 2.5rem;">404 Error Not Found.</h2>
+	<h3 class="main_header" style="font-size: 2.5rem;">404 Error Not Found.</h3>
 </body>
 </html>
