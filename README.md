@@ -7,8 +7,8 @@ This is a **demo** version of a live chat application using php and ajax, it's b
 * It uses **zero** frameworks and libraries.
 
 ## How It Works?!
-* When a user first logs in, the application creates a cookie on the user's browser, this cookie is used to identify the user and it expires after 3 days of idle use of the app or logging out, and it does not expire as long as the user is still active.
-* Every user that has been logged in before, has a row on the db users' table, if the timestamp of `user_last_active` column exceeds 3 days, the user won't be visible anymore on the app, and this Nickname would be usable again. 
+* When a user first logs in, the application creates a cookie on the user's browser, this cookie is used to identify the user and it expires after 3 days of idle use of the app or after logging out, but it does not expire as long as the user is still active.
+* Every user that has been logged in before, has a row on the db users' table, if the timestamp of `user_last_active` column exceeds 3 days, the user row and all his conversations and messages will be deleted, and this Nickname would be usable again. 
 
 ## How to Use?
 1. First you need to clone this repository into your computer, and put it to your public_html directory, or in my case in 'htdocs' inside 'xampp' files.
@@ -19,14 +19,10 @@ This is a **demo** version of a live chat application using php and ajax, it's b
  
 
 ## About the API
-The chat API responds with HTML text instead of JSON format.
-I intended to make it simple as possible and not using any javascript libraries to convert JSON to HTML.
-If you want to use JSON to reduce server traffic, you can use any of those libraries:
+The chat API responds to calls with HTML text instead of JSON format.
+I intended to make it simple as possible without using any javascript libraries to convert JSON to HTML.
+If you want to use JSON instead to reduce server traffic, you can rebuild the api and combine it with one of those libraries:
 1. jQuery   -- https://github.com/jquery/jquery
 2. Mustache -- https://github.com/janl/mustache.js
 3. JsRender -- https://github.com/BorisMoore/jsrender
-4. Or you can use ES6's template litrals, but still not supported in all browsers.
-
-#### Edit 1:
-The HTML api was not a good idea.
-
+4. Or you can use ES6's template literals, but still not supported in all browsers.
