@@ -157,10 +157,6 @@ button.submit_btn:active, button.submit_btn:focus {
     box-shadow: 0 0 0 3px rgba(0, 123, 255, .2);
 }
 
-/* -- login page end here -- */
-
-/* -- chat page -- */
-
 div.loader div{
     border: 5px solid #fff;
     border-top: 5px solid #43a7ff;
@@ -186,6 +182,10 @@ div.loader {
     100% { -webkit-transform: rotate(360deg); transform: rotate(360deg); }
 }
 
+/* -- login page end here -- */
+
+/* -- chat page -- */
+
 div.chat_box{
     margin: 0 auto 15px auto;
 	width: 1000px;
@@ -209,7 +209,6 @@ div.side_list {
 div.Contacts_header,
 div.inbox_header{
     padding: 5px 10px;
-    /* padding: 10px 29px 10px 20px; */
     overflow: hidden;
     background-color: #8ac9ff;
 }
@@ -382,9 +381,9 @@ textarea#message_to_send{
     resize: none;
     display: inline-block;
     float: left;
+    height: 32px; /* fire fox */
 }
 
-/* button show_more*/
 button#send_btn{
     font-size: 12px;
     border: none;
@@ -474,14 +473,19 @@ li.msg_form_me{
     text-align: right;
 }
 
-/* msg seen */ 
-li.msg_form_me span{
+span#seen{
     font-weight: 900;
     font-size: 30px;
-    color: #00bc44;
+    color: #43a7ff;
     position: absolute;
     bottom: 0;
     left: 0;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
 }
 
 img.img_sender{
@@ -521,17 +525,12 @@ div.message{
     word-wrap: break-word;
 
     -ms-word-break: break-all;
-      /* This is the dangerous one in WebKit, as it breaks things wherever */
     word-break: break-all;
-    /* Instead use this non-standard one: */
     word-break: break-word;
-
-      /* Adds a hyphen where the word breaks, if supported (No Blink) */
     -ms-hyphens: auto;
     -moz-hyphens: auto;
     -webkit-hyphens: auto;
     hyphens: auto;
-
 
     padding: 18px 20px;
     line-height: 26px;
@@ -601,3 +600,5 @@ span#remove_btn{
     color: #43a7ff;
     padding-left: 30px;
 }
+
+/* -- chat page end here -- */

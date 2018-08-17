@@ -4,17 +4,26 @@
 session_start();
 require_once 'db.php';
 
+function deleteQuery($sql, $param1, $param2){
+	global $conn;
+    $query = $conn->prepare($sql);
+    $query->bindParam($param1, $param2);
+    $query->execute();
+}
+
+// Logout Function
 if (isset($_GET['logout']) && $_GET['logout'] == true && isset($_SESSION['user_id'])) {
 	$user_id = $_SESSION['user_id']; 
 	$user_name = $_SESSION['user_name']; 
 
-	$delete_query = $conn->prepare("DELETE FROM users WHERE user_id = :user_id");
-	$delete_query->bindParam(':user_id', $user_id);
-	$delete_query->execute();
+	$sql = "DELETE FROM users WHERE user_id = :user_id";
+	deleteQuery($sql, ':user_id', $user_id);
 
-	$delete_query = $conn->prepare("DELETE FROM conversations WHERE conv_username1 = :user_name OR conv_username2 = :user_name");
-	$delete_query->bindParam(':user_name', $user_name);
-	$delete_query->execute();
+	$sql = "DELETE FROM conversations WHERE conv_username1 = :user_name OR conv_username2 = :user_name";
+	deleteQuery($sql, ':user_name', $user_name);
+
+	$sql = "DELETE FROM messages WHERE msg_from = :user_name OR msg_from = :user_name";
+	deleteQuery($sql, ':user_name', $user_name);
 
 	unset($_COOKIE['MEMBER']);
 	setcookie('MEMBER', '', strtotime('-3 days'), '/chatApp');
@@ -71,7 +80,7 @@ if (!isset($_SESSION['user_id'])) {
 		</div>
 		<div id="chat">
 			<h2 class="default_h2">Welcome Back!</h2>
-			<p class="default_p">You can now chat with anyone you want, Just click on them and start the chat!</p>
+			<p class="default_p">You can now chat with anyone you want, Just click on them and start the conversation!</p>
 		</div>
 	</div>
 </body>

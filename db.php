@@ -8,7 +8,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET' && realpath(__FILE__) == realpath($_SERV
 
 // PDO Params
 $host = 'localhost';
-$db = 'chatApp';
+$db = 'chatapp';
 $charset = 'utf8mb4'; // This is a super set of utf-8 that supports emojis
 $user = 'root';
 $pass = '';

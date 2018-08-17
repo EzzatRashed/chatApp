@@ -4,6 +4,13 @@
 session_start();
 require_once 'db.php';
 
+function deleteQuery($sql, $param1, $param2){
+	global $conn;
+    $query = $conn->prepare($sql);
+    $query->bindParam($param1, $param2);
+    $query->execute();
+}
+
 /* Login Function */
 function login($user_token){
 	global $conn; 
@@ -14,7 +21,6 @@ function login($user_token){
 	if($login_query->rowCount() == 0){
 		setcookie('MEMBER', '', strtotime('-3 days'));
 		session_unset();
-		$_SESSION['message'] = 'Login failed, please try again.';
        	header("location: /chatApp");
 		die();
 	} else {
@@ -69,9 +75,14 @@ if (isset($_POST['submit'])) {
 		$user_last_active = strtotime($user['user_last_active']);
 
 		if ($user_last_active < strtotime('-3 days')) {
-			$delete_query = $conn->prepare("DELETE FROM users WHERE user_name = :user_name");
-			$delete_query->bindParam(':user_name', $user_name);
-			$delete_query->execute();
+			$sql = "DELETE FROM users WHERE user_name = :user_name";
+			deleteQuery($sql, ':user_name', $user_name);
+
+			$sql = "DELETE FROM conversations WHERE conv_username1 = :user_name OR conv_username2 = :user_name";
+			deleteQuery($sql, ':user_name', $user_name);
+
+			$sql = "DELETE FROM messages WHERE msg_from = :user_name OR msg_from = :user_name";
+			deleteQuery($sql, ':user_name', $user_name);
 		} else {
 			$_SESSION['message'] = 'This Nickname is taken.';
 	       	header("location: /chatApp");

@@ -68,6 +68,21 @@ function selectQuery($sql, $param1, $param2) {
     return $query->fetchAll(PDO::FETCH_ASSOC);
 }
 
+function deleteQuery($sql, $param1, $param2){
+	global $conn;
+    $query = $conn->prepare($sql);
+    $query->bindParam($param1, $param2);
+    $query->execute();
+}
+
+function generateErrorHTML($error_msg){
+	return '
+	<li class="error_msg">
+		<h4>'.$error_msg.'</h4>
+	</li>
+	';
+}
+
 function generateSideListHTML($contact, $inbox){
 	if ($contact['user_id'] == $_SESSION['user_id']) {
 		return;
@@ -130,14 +145,6 @@ function generateChatHTML($msg, $msg_from, $msg_to, $msg_time, $avatar){
     </li>';
 }
 
-function generateErrorHTML($error_msg){
-	return '
-	<li class="error_msg">
-		<h4>'.$error_msg.'</h4>
-	</li>
-	';
-}
-
 function updateUserLastActive($my_user_name){
 	global $conn;
 	$update_query = $conn->prepare("UPDATE users SET user_last_active = CURRENT_TIMESTAMP WHERE user_name = :my_user_name");
@@ -188,9 +195,14 @@ if (isset($_SESSION['user_id']) && isset($_POST['load_side_list']) && $_POST['lo
 		$user_name = $contact['user_name'];
 
 		if ($user_last_active < strtotime('-3 days')) {
-			$delete_query = $conn->prepare("DELETE FROM users WHERE user_name = :user_name");
-			$delete_query->bindParam(':user_name', $user_name);
-			$delete_query->execute();
+			$sql = "DELETE FROM users WHERE user_name = :user_name";
+			deleteQuery($sql, ':user_name', $user_name);
+
+			$sql = "DELETE FROM conversations WHERE conv_username1 = :user_name OR conv_username2 = :user_name";
+			deleteQuery($sql, ':user_name', $user_name);
+
+			$sql = "DELETE FROM messages WHERE msg_from = :user_name OR msg_from = :user_name";
+			deleteQuery($sql, ':user_name', $user_name);
 			unset($contacts[$key]);
 		} 
 	}
