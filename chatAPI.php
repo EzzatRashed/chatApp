@@ -379,6 +379,9 @@ if (isset($_SESSION['user_id']) && isset($_POST['to']) && !empty($_POST['to']) |
 	    ':msg_from'   => $my_user_name,
 	    ':msg_to'     => $other_user_name,
     ));
+    $update_query = $conn->prepare("UPDATE conversations SET conv_last_active = CURRENT_TIMESTAMP WHERE conv_token = :conv_token");
+	$update_query->bindParam(":conv_token", $conv_token);
+	$update_query->execute();
 
 	// Receive Formatted Message
 	echo generateChatHTML($msg_body, $my_user_name, $other_user_name, formatTimeString(date("Y-m-j H:i:s")), getAvatar($_SESSION['user_gender']));
