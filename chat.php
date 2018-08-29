@@ -22,7 +22,7 @@ if (isset($_GET['logout']) && $_GET['logout'] == true && isset($_SESSION['user_i
 	$sql = "DELETE FROM conversations WHERE conv_username1 = :user_name OR conv_username2 = :user_name";
 	deleteQuery($sql, ':user_name', $user_name);
 
-	$sql = "DELETE FROM messages WHERE msg_from = :user_name OR msg_from = :user_name";
+	$sql = "DELETE FROM messages WHERE msg_from = :user_name OR msg_to = :user_name";
 	deleteQuery($sql, ':user_name', $user_name);
 
 	unset($_COOKIE['MEMBER']);
