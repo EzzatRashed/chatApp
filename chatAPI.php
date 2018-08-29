@@ -355,6 +355,15 @@ if (isset($_SESSION['user_id']) && isset($_POST['to']) && !empty($_POST['to']) |
 		die();
 	}
 
+	// Ensure User Exsists
+	$sql = "SELECT * FROM users WHERE user_name = :other_user_name";
+	$user = selectQuery($sql, ':other_user_name', $other_user_name);
+
+	if (empty($user)){
+		echo generateErrorHTML('User is not available any more!');
+		die();
+	} 
+
 	// Check For Exsisting Conversation
 	$conv_query = checkExsistingConv($my_user_name, $other_user_name);
 	if(empty($conv_query)){
