@@ -539,7 +539,7 @@ div.message{
     font-size: 14px;
     width: 95%;
     position: relative;
-    text-align: right;
+    text-align: left;
 }
 
 div.message span{
@@ -552,6 +552,8 @@ div.msg_to_me{
 
 div.msg_form_me{
     background-color: #a0d2ff;
+    text-align: right;
+    direction: ltr;
 }
 
 div.message:after{
