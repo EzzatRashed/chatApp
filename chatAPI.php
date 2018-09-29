@@ -180,7 +180,7 @@ function checkExsistingConv($my_user_name, $other_user_name){
 
 // Prevent Direct Access to this File
 if ($_SERVER['REQUEST_METHOD'] == 'GET' && realpath(__FILE__) == realpath($_SERVER['SCRIPT_FILENAME']) || !isset($_SESSION['user_id'])) {
-    header('location: 404');
+    header('location: ../404');
     die();
 }
 
@@ -401,6 +401,7 @@ if (isset($_SESSION['user_id']) && isset($_POST['to']) && !empty($_POST['to']) |
 
 // Response to getLastMsg() AJAX Call
 if (isset($_SESSION['user_id']) && isset($_POST['get_msg_from']) && !empty($_POST['get_msg_from'])){
+	$my_user_name = $_SESSION['user_name'];
 	$other_user_name = $_POST['get_msg_from'];
 
 	$sql = "SELECT * FROM users WHERE user_name = :user_name";
@@ -411,8 +412,13 @@ if (isset($_SESSION['user_id']) && isset($_POST['get_msg_from']) && !empty($_POS
 	} 
 
 	$avatar = getAvatar($contact[0]['user_gender']);
-	$sql = "SELECT * FROM messages WHERE msg_from = :other_user_name AND msg_seen = '0'";
-	$messages = selectQuery($sql, ':other_user_name', $other_user_name);
+	$sql = "SELECT * FROM messages WHERE msg_from = :other_user_name AND msg_to = :my_user_name AND msg_seen = '0'";
+    $query = $conn->prepare($sql);
+	$query->bindParam(':other_user_name', $other_user_name);
+	$query->bindParam(':my_user_name', $my_user_name);
+    $query->execute();
+	$messages = $query->fetchAll(PDO::FETCH_ASSOC);
+	
 	foreach ($messages as $message) {
 		$msg_id = $message['msg_id'];
 		$msg = $message['msg_body'];
