@@ -22,7 +22,6 @@ This is a **demo** version of a live chat application using php and ajax, it's b
 The chat API responds to calls with HTML text instead of JSON format.
 I intended to make it simple as possible without using any javascript libraries to convert JSON to HTML.
 If you want to use JSON instead to reduce server traffic, you can rebuild the api and combine it with one of those libraries:
-1. jQuery   -- https://github.com/jquery/jquery
-2. Mustache -- https://github.com/janl/mustache.js
-3. JsRender -- https://github.com/BorisMoore/jsrender
-4. Or you can use ES6's template literals, but still not supported in all browsers.
+1. Mustache -- https://github.com/janl/mustache.js
+2. JsRender -- https://github.com/BorisMoore/jsrender
+3. Or you can use ES6's template literals, but still not supported in all browsers.
