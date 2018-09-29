@@ -180,7 +180,7 @@ function checkExsistingConv($my_user_name, $other_user_name){
 
 // Prevent Direct Access to this File
 if ($_SERVER['REQUEST_METHOD'] == 'GET' && realpath(__FILE__) == realpath($_SERVER['SCRIPT_FILENAME']) || !isset($_SESSION['user_id'])) {
-    header('location: ../404');
+    header('location: 404');
     die();
 }
 
